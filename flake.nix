@@ -86,62 +86,130 @@
       # at RUN TIME for plugins. Will be available to PATH within neovim terminal
       # this includes LSPs
       lspsAndRuntimeDeps = {
-        # some categories of stuff.
-        general = with pkgs; [
+        core = with pkgs; [
           universal-ctags
           ripgrep
           fd
           tree-sitter
         ];
-        # these names are arbitrary.
+        # linters to use with nvim-lint plugin
         lint = with pkgs; [
+          statix
         ];
-        # but you can choose which ones you want
-        # per nvim package you export
-        debug = with pkgs; {
-        };
-        # and easily check if they are included in lua
+        # formatters to use with conform-nvim plugin
         format = with pkgs; [
           alejandra
         ];
+        # debbugers and debbuging tools
+        debug = with pkgs; {
+        };
+
+        # honestly unsure, this is from example config
         neonixdev = {
           # also you can do this.
           inherit (pkgs) nix-doc lua-language-server nixd;
           # and each will be its own sub category
         };
+
+        # language support will go here
       };
 
       # This is for plugins that will load at startup without using packadd:
       startupPlugins = {
+        core = with pkgs.vimPlugins; [
+          lze
+          lzextras
+          vim-repeat
+          plenary-nvim
+          nvim-notify
+          nvim-web-devicons
+          nvim-lspconfig
+          # (nvim-notify.overrideAttrs {doCheck = false;}) # TODO: remove overrideAttrs after check is fixed
+        ];
         debug = with pkgs.vimPlugins; [
           nvim-nio
         ];
-        general = with pkgs.vimPlugins; {
-          always = [
-            lze
-            lzextras
-            vim-repeat
-            plenary-nvim
-            (nvim-notify.overrideAttrs {doCheck = false;}) # TODO: remove overrideAttrs after check is fixed
-          ];
-          extra = [
-            oil-nvim
-            nvim-web-devicons
-          ];
-        };
       };
 
-      # not loaded automatically at startup.
-      # use with packadd and an autocommand in config to achieve lazy loading
+      # Lazy loaded plugins, this config uses lze for this
       optionalPlugins = {
-        gitPlugins = with pkgs.neovimPlugins; [];
-        general = with pkgs.vimPlugins; [];
+        format = with pkgs.vimPlugins; [conform-nvim];
+        lint = with pkgs.vimPlugins; [nvim-lint];
+        neonixdev = with pkgs.vimPlugins; [lazydev-nvim];
+
+        completion = with pkgs.vimPlugins; [
+          luasnip
+          cmp-cmdline
+          blink-cmp
+          blink-compat
+          blink-cmp-avante
+          colorful-menu-nvim
+        ];
+
+        syntax = with pkgs.vimPlugins; [
+          nvim-treesitter.withAllGrammars
+          nvim-treesitter-textobjects
+          rainbow-delimiters-nvim
+          nvim-ufo
+        ];
+
+        search = with pkgs.vimPlugins; [
+          telescope-nvim
+          telescope-fzf-native-nvim
+          telescope-ui-select-nvim
+          flash-nvim
+        ];
+
+        editing = with pkgs.vimPlugins; [
+          which-key-nvim
+          indent-blankline-nvim
+          comment-nvim
+          undotree
+          vim-sleuth
+          mini-nvim
+          snacks-nvim
+          todo-comments-nvim
+          nvim-colorizer-lua
+        ];
+
+        ui = with pkgs.vimPlugins; [
+          fidget-nvim
+          lualine-nvim
+          bufferline-nvim
+          neo-tree-nvim
+          edgy-nvim
+          nui-nvim
+          noice-nvim
+          trouble-nvim
+          toggleterm-nvim
+        ];
+
+        git = with pkgs.vimPlugins; [
+          gitsigns-nvim
+          editorgit-nvim
+        ];
+
+        ai = with pkgs.vimPlugins; [
+          avante-nvim
+        ];
+
+        productivity = with pkgs.vimPlugins; [
+          vim-wakatime
+        ];
+
+        debug = with pkgs.vimPlugins; {
+          default = [
+            nvim-dap
+            nvim-dap-ui
+            nvim-dap-virtual-text
+          ];
+        };
       };
 
       # shared libraries to be added to LD_LIBRARY_PATH
       # variable available to nvim runtime
       sharedLibraries = {
-        general = with pkgs; [
+        core = with pkgs; [
           # libgit2
         ];
       };
@@ -150,18 +218,12 @@
       # this section is for environmentVariables that should be available
       # at RUN TIME for plugins. Will be available to path within neovim terminal
       environmentVariables = {
-        test = {
-          CATTESTVAR = "It worked!";
-        };
       };
 
       # If you know what these are, you can provide custom ones by category here.
       # If you dont, check this link out:
       # https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
       extraWrapperArgs = {
-        test = [
-          ''--set CATTESTVAR2 "It worked again!"''
-        ];
       };
 
       # lists of the functions you would have passed to
@@ -179,6 +241,55 @@
       extraLuaPackages = {
         test = [(_: [])];
       };
+
+      # see :help nixCats.flake.outputs.categoryDefinitions.default_values
+      # this will enable test.default and debug.default
+      # if any subcategory of test or debug is enabled
+      # WARNING: use of categories argument in this set will cause infinite recursion
+      # The categories argument of this function is the FINAL value.
+      # You may use it in any of the other sets.
+      extraCats = {
+        debug = [
+          ["debug" "default"]
+          ["core"]
+        ];
+
+        ui = [
+          ["core"]
+        ];
+        completion = [
+          ["core"]
+        ];
+        syntax = [
+          ["core"]
+        ];
+        search = [
+          ["core"]
+        ];
+        editing = [
+          ["core"]
+        ];
+        git = [
+          ["core"]
+        ];
+        productivity = [
+          ["core"]
+        ];
+        lint = [
+          ["core"]
+        ];
+        format = [
+          ["core"]
+        ];
+        neonixdev = [
+          ["core"]
+        ];
+
+        ai = [
+          ["ui"]
+          ["completion"]
+        ];
+      };
     };
 
     # And then build a package with specific categories from above here:
@@ -190,7 +301,7 @@
     packageDefinitions = {
       # These are the names of your packages
       # you can include as many as you wish.
-      stevenvim = {
+      nvim = {
         pkgs,
         name,
         ...
@@ -204,22 +315,38 @@
           # IMPORTANT:
           # your alias may not conflict with your other packages.
           aliases = ["vim" "vi"];
+
+          configDirName = "stevenvim";
+          hosts.python3.enable = true;
+          hosts.node.enable = true;
         };
         # and a set of categories that you want
         # (and other information to pass to lua)
         categories = {
-          general = true;
-          gitPlugins = true;
-          customPlugins = true;
-          test = true;
-          example = {
-            youCan = "add more than just booleans";
-            toThisSet = [
-              "and the contents of this categories set"
-              "will be accessible to your lua with"
-              "nixCats('path.to.value')"
-              "see :help nixCats"
-            ];
+          core = true;
+          completion = true;
+          syntax = true;
+          search = true;
+          editing = true;
+          ui = true;
+          git = true;
+          ai = true;
+          productivity = true;
+
+          lint = true;
+          format = true;
+          neonixdev = true;
+
+          # No plugins, just lua check
+          lspDebugMode = false;
+        };
+        extra = {
+          # to keep the categories table from being filled with non category things that you want to pass
+          # there is also an extra table you can use to pass extra stuff.
+          # but you can pass all the same stuff in any of these sets and access it in lua
+          nixdExtras = {
+            nixpkgs = ''import ${pkgs.path} {}'';
+            # or inherit nixpkgs;
           };
         };
       };
@@ -303,7 +430,7 @@
       nixosModules.default = nixosModule;
       homeModules.default = homeModule;
 
-      inherit utils nixosModule homeModule;
+      inherit utils;
       inherit (utils) templates;
     });
 }
