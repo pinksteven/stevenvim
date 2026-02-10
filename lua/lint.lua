@@ -1,7 +1,7 @@
-require('lze').load {
+return {
     {
         "nvim-lint",
-        for_cat = 'lint',
+        for_cat = 'core',
         -- cmd = { "" },
         event = "FileType",
         -- ft = "",
@@ -14,7 +14,7 @@ require('lze').load {
                 -- markdown = {'vale',},
                 -- javascript = { 'eslint' },
                 -- typescript = { 'eslint' },
-                nix = { 'statix' },
+                nix = nixInfo(nil, "settings", "cats", "nix") and { "statix" } or nil,
             }
 
             vim.api.nvim_create_autocmd({ "BufWritePost" }, {

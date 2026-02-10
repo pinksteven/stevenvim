@@ -1,7 +1,7 @@
-require('lze').load {
+return {
     {
         "conform.nvim",
-        for_cat = 'format',
+        for_cat = 'core',
         -- cmd = { "" },
         -- event = "",
         -- ft = "",
@@ -23,7 +23,8 @@ require('lze').load {
                     -- python = { "isort", "black" },
                     -- Use a sub-list to run only the first available formatter
                     -- javascript = { { "prettierd", "prettier" } },
-                    nix = { "alejandra" },
+                    nix = nixInfo(nil, "settings", "cats", "nix") and { "alejandra" } or nil,
+                    lua = nixInfo(nil, "settings", "cats", "lua") and { "stylua" } or nil,
                 },
                 format_on_save = {
                     -- These options will be passed to conform.format()
