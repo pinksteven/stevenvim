@@ -1,4 +1,4 @@
-{
+inputs: {
   config,
   wlib,
   lib,
@@ -62,6 +62,7 @@
       nvim-treesitter.withAllGrammars
       nvim-treesitter-textobjects
       rainbow-delimiters-nvim
+      indent-blankline-nvim
       nvim-ufo
     ];
   };
@@ -82,14 +83,10 @@
     lazy = true;
     data = with pkgs.vimPlugins; [
       which-key-nvim
-      indent-blankline-nvim
-      comment-nvim
       undotree
       vim-sleuth
       mini-nvim
-      snacks-nvim
       todo-comments-nvim
-      nvim-colorizer-lua
     ];
   };
 
@@ -105,7 +102,13 @@
       nui-nvim
       noice-nvim
       trouble-nvim
-      toggleterm-nvim
+      snacks-nvim
+      alpha-nvim
+      yazi-nvim
+      (config.nvim-lib.mkPlugin "neovim-session-manager" inputs.plugins-neovim-session-manager)
+    ];
+    extraPackages = with pkgs; [
+      figlet
     ];
   };
 

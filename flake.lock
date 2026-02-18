@@ -36,10 +36,27 @@
         "type": "github"
       }
     },
+    "plugins-neovim-session-manager": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1769416169,
+        "narHash": "sha256-d7lXPIy6qJDPvFk8twwkqKUWI205HfTqXMspnVRkng0=",
+        "owner": "Shatur",
+        "repo": "neovim-session-manager",
+        "rev": "89d253a6c68af60b49570044591d5b8701866601",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Shatur",
+        "repo": "neovim-session-manager",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "flake-parts": "flake-parts",
         "nixpkgs": "nixpkgs",
+        "plugins-neovim-session-manager": "plugins-neovim-session-manager",
         "wrappers": "wrappers"
       }
     },

@@ -10,6 +10,10 @@
       url = "github:hercules-ci/flake-parts";
       inputs.nixpkgs-lib.follows = "nixpkgs";
     };
+    plugins-neovim-session-manager = {
+      url = "github:Shatur/neovim-session-manager";
+      flake = false;
+    };
   };
   outputs = {
     self,
@@ -27,6 +31,6 @@
         wrappers.control_type = "exclude"; # | "build"  (default: "exclude")
         wrappers.packages = {};
       };
-      flake.wrappers.default = ./module.nix;
+      flake.wrappers.default = nixpkgs.lib.modules.importApply ./module.nix inputs;
     };
 }
